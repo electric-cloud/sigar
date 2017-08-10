@@ -299,6 +299,10 @@
   <target name="build-jni"
           depends="jni-init,prepare-src,jni-compile,jni-lib-copy,copy-includes"
           if="jni.libarch"/>
+  
+  <target name="build-win32"
+            depends="jni-init,prepare-src,jni-win32"
+            if="win32"/>
 
   <target name="pack">
     <jar jarfile="${sigar-bin}/lib/${sigar.jar}"

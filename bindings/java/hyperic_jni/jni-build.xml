@@ -507,6 +507,56 @@
     </cc>
   </target>
 
+  <target name="jni-win32" if="jni.arch64">
+    <mkdir dir="${jni.objdir}/../x86/lib"/>
+    <mkdir dir="${jni.objdir}/../x86"/>
+    <cc outtype="shared"
+      outfile="${jni.objdir}/../x86/lib/sigar-x86-winnt"
+      objdir="${jni.objdir}/../x86/"
+      runtime="${cc.runtime}"
+      relentless="false">
+
+      <linker name="msvc" debug="${jni.debug}" if="win32">
+        <libset if="jni.libset.libs"
+                dir="${jni.libset.dir}"
+                libs="${jni.libset.libs}"/>
+
+        <linkerarg value="/MACHINE:X86" if="jni.arch64"/>
+        <linkerarg value="${jni.info.res}" if="jni.info.res"/>
+        <syslibset libs="kernel32,user32,advapi32,ws2_32,netapi32,shell32,pdh,version"/>
+      </linker>
+      <compiler name="msvc" debug="${jni.debug}" if="win32">
+        <defineset>
+          <define name="WIN32"/>
+          <define name="_CRT_SECURE_NO_DEPRECATE"/>
+          <!-- XXX 2008 MSC express/SDK does not include atl headers -->
+          <define name="SIGAR_NO_ATL" if="jni.noatl"/>
+        </defineset>
+        <compilerarg value="/arch:IA32"/>
+      </compiler>
+
+      <!-- C sources -->
+      <fileset dir="${jni.source.dir}">
+        <patternset refid="jni.source.files"/>
+      </fileset>
+
+      <includepath>
+        <path refid="jni.include.dirs"/>
+      </includepath>
+
+      <sysincludepath location="${jni.javahome}/include"/>
+      <sysincludepath location="${jni.javahome}/include/${jni.jdk.os}"/>
+      <sysincludepath location="${jni.dmalloc}/include"
+                      if="jni.dmalloc"/>
+      </cc>
+
+      <mkdir dir="${jni.bin}/lib"/>
+    
+      <copy toDir="${jni.bin}/lib" overwrite="true">
+        <fileset dir="${jni.objdir}/../x86/lib"/>
+      </copy>
+  </target>
+
   <target name="jni-clean">
     <delete dir="${jni.objdir}"/>
   </target>
